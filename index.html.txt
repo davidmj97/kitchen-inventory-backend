@@ -1,0 +1,1664 @@
+!DOCTYPE html
+html
+head
+  meta name=viewport content=width=device-width, initial-scale=1.0
+  titleKITCHEN INVENTORY - Unifiedtitle
+  link href=httpsfonts.googleapis.comcss2family=Righteous&display=swap rel=stylesheet
+  link href=httpsfonts.googleapis.comiconfamily=Material+Icons rel=stylesheet
+  style
+    body {
+      margin 0;
+      font-family 'Righteous', cursive;
+      background linear-gradient(135deg, #0a0f0c, #15271c);
+      color white;
+      padding 10px;
+    }
+    .page-section { display none; }
+    .page-section.active { display block; }
+    h1 {
+      text-align center;
+      font-size 20px;
+      margin-bottom 15px;
+      color #c8facc;
+      text-shadow 1px 1px 3px rgba(0,0,0,0.6);
+    }
+    .update-top {
+      display flex;
+      justify-content flex-end;
+      margin-bottom 10px;
+    }
+    .update-btn-small {
+      background transparent;
+      color white;
+      font-size 12px;
+      border 1px solid #81e4a2;
+      border-radius 8px;
+      padding 6px 10px;
+      font-family 'Righteous', cursive;
+      cursor pointer;
+      transition all 0.2s ease-in-out;
+    }
+    .update-btn-smallhover {
+      background rgba(129, 228, 162, 0.1);
+      box-shadow 0 0 8px rgba(129, 228, 162, 0.3);
+    }
+    .box-container {
+      display flex;
+      overflow-x auto;
+      gap 10px;
+      padding-bottom 10px;
+    }
+    .inventory-box {
+      flex 0 0 auto;
+      width 120px;
+      height 55px;
+      border-radius 12px;
+      background linear-gradient(135deg, #123e2e, #1e5a3c);
+      box-shadow inset 0 0 4px rgba(0,255,140,0.2), 0 3px 8px rgba(0,255,140,0.15), 0 6px 12px rgba(0, 255, 100, 0.15);
+      padding 6px;
+      display flex;
+      flex-direction column;
+      justify-content space-between;
+      position relative;
+    }
+    .box-title { font-size 10px; color #e0ffe8; }
+    .box-value {
+      font-size 32px;
+      font-weight 900;
+      color #ffffff;
+      letter-spacing 1px;
+    }
+    .box-unit {
+      font-size 10px;
+      color #b2f0c0;
+      margin-left 4px;
+    }
+    .last-updated {
+      position absolute;
+      bottom 3px;
+      right 6px;
+      font-size 8px;
+      color #88cfa1;
+    }
+    .status-table {
+      margin-top 15px;
+      width 95%;
+      background #112319;
+      border-radius 10px;
+      padding 10px;
+      box-shadow 0 2px 10px rgba(0,255,100,0.2);
+      position relative;
+    }
+    .status-row {
+      display flex;
+      justify-content space-between;
+      padding 6px 0;
+      border-bottom 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .status-rowlast-child { border-bottom none; }
+    .status-label { font-size 12px; color #b0eac2; }
+    .status-value { font-size 12px; color #e4ffe9; }
+    .toggle-cell {
+      margin 26px 0 0 5px;
+      display flex;
+      align-items center;
+      justify-content flex-start;
+      width fit-content;
+      border-radius 14px;
+      background linear-gradient(135deg, rgba(129,228,162,0.18), rgba(34,66,50,0.35));
+      box-shadow 0 2px 20px rgba(129,228,162,0.04);
+      padding 5px 15px 5px 10px;
+      gap 11px;
+    }
+    .toggle-title {
+      font-size 15px;
+      text-transform uppercase;
+      color #fff;
+      letter-spacing 1px;
+      font-family 'Righteous', cursive;
+      text-shadow 1px 1px 2px rgba(0,0,0,0.18);
+      margin 0;
+      padding 0 4px 0 0;
+      flex 1;
+      text-align left;
+      transition color 0.2s;
+    }
+    .toggle-btn {
+      background transparent;
+      border none;
+      cursor pointer;
+      outline none;
+      padding 0;
+      display flex;
+      align-items center;
+      justify-content center;
+      border-radius 50%;
+      transition background 0.2s;
+    }
+    .toggle-btnhover {
+      background rgba(129, 228, 162, 0.18);
+    }
+    .toggle-btn svg {
+      vertical-align middle;
+      width 34px;
+      height 20px;
+      transition all 0.3s cubic-bezier(.4,2,.3,1);
+    }
+    .section-title { display none; }
+    .list-container {
+      margin-top 10px;
+      display flex;
+      flex-direction column;
+      gap 10px;
+    }
+    .list-header {
+      display flex;
+      justify-content space-between;
+      align-items center;
+      margin-bottom 5px;
+    }
+    .list-header h3 {
+      font-size 14px;
+      margin 0;
+      color #bbffcc;
+    }
+    .copy-btn {
+      font-size 12px;
+      color #a0f4c4;
+      cursor pointer;
+      text-decoration underline;
+      display flex;
+      align-items center;
+      gap 4px;
+      user-select none;
+    }
+    .copy-btn svg {
+      display inline-block;
+      vertical-align middle;
+      margin-right 2px;
+    }
+    table {
+      width 100%;
+      border-collapse collapse;
+      background #1a3024;
+      border-radius 8px;
+      overflow hidden;
+      font-size 12px;
+      table-layout fixed;
+    }
+    th, td {
+      padding 6px 10px;
+      text-align left;
+      color #eaffef;
+      width 50%;
+    }
+    th {
+      background-color #26503a;
+      color #b7ffd6;
+      font-weight 500;
+    }
+    trnot(last-child) {
+      border-bottom 1px solid #2d4e3b;
+    }
+    .back-button {
+      background transparent;
+      border none;
+      color #81e4a2;
+      font-size 24px;
+      cursor pointer;
+      margin-bottom 10px;
+    }
+    h2 {
+      text-align center;
+      color #b9ffc9;
+      margin-top 10px;
+      margin-bottom 20px;
+      font-size 20px;
+    }
+    .button-group {
+      display flex;
+      justify-content space-between;
+      gap 5px;
+      margin-bottom 20px;
+      flex-wrap nowrap;
+    }
+    .button-group-scroll {
+      display flex;
+      overflow-x auto;
+      gap 5px;
+      margin-bottom 20px;
+      flex-wrap nowrap;
+      scrollbar-width thin;
+      scrollbar-color #81e4a2 #15271c;
+      padding-bottom 5px;
+      padding-top 2px;
+    }
+    .action-btn {
+      flex 1;
+      text-align center;
+      padding 6px 2px;
+      font-size 10px;
+      color white;
+      border 1px solid #81e4a2;
+      border-radius 6px;
+      background transparent;
+      cursor pointer;
+      transition all 0.2s ease-in-out;
+      white-space nowrap;
+    }
+    .action-btn.active {
+      background linear-gradient(135deg, #0e3c26, #1a6141);
+      border 1px solid #3ff5a8;
+      box-shadow 0 0 8px rgba(63, 245, 168, 0.25);
+    }
+    .element-box {
+      margin-top 25px;
+      padding 15px;
+      background #112319;
+      border-radius 10px;
+      box-shadow 0 2px 10px rgba(0,255,100,0.15);
+    }
+    .section-header {
+      display flex;
+      justify-content space-between;
+      align-items center;
+      margin-bottom 12px;
+    }
+    .section-label {
+      padding 6px 10px;
+      background linear-gradient(135deg, #0e3c26, #1a6141);
+      border 1px solid #81e4a2;
+      border-radius 6px;
+      color white;
+      font-size 12px;
+      box-shadow 0 2px 4px rgba(129, 228, 162, 0.2);
+      white-space nowrap;
+    }
+    .change-select {
+      transform translateX(-10px);
+      font-size 12px;
+      background transparent;
+      border none;
+      color #81e4a2;
+      text-decoration underline;
+      cursor pointer;
+    }
+    .field-row {
+      display flex;
+      align-items center;
+      gap 10px;
+      margin-bottom 15px;
+    }
+    .value-controls {
+      display flex;
+      align-items center;
+      gap 6px;
+    }
+    .number-input {
+      width 50px;
+      text-align center;
+      background #1e382a;
+      border 1px solid #81e4a2;
+      color white;
+      padding 5px;
+      border-radius 4px;
+    }
+    .value-btn {
+      padding 2px 6px;
+      background linear-gradient(135deg, #0e3c26, #1a6141);
+      border none;
+      border-radius 4px;
+      color white;
+      font-size 12px;
+      cursor pointer;
+    }
+    .unit-select {
+      background #1e382a;
+      color white;
+      border 1px solid #81e4a2;
+      padding 5px;
+      border-radius 4px;
+      font-size 12px;
+    }
+    .update-btn, .delete-btn, .status-save-btn {
+      padding 6px 12px;
+      border 1px solid #81e4a2;
+      border-radius 8px;
+      color white;
+      background transparent;
+      font-size 12px;
+      cursor pointer;
+      transition all 0.2s ease-in-out;
+    }
+    .text-link-btn {
+      background none;
+      border none;
+      color #81e4a2;
+      font-size 12px;
+      cursor pointer;
+      margin-left 10px;
+      text-decoration underline;
+      font-family 'Righteous', cursive;
+    }
+    .all-list-footer-btns {
+      display flex;
+      justify-content flex-end;
+      gap 10px;
+      margin-top 15px;
+    }
+    .all-list-footer-btn {
+      display flex;
+      align-items center;
+      gap 3px;
+      background transparent;
+      border 1.2px solid #81e4a2;
+      color #81e4a2;
+      border-radius 7px;
+      font-size 13px;
+      cursor pointer;
+      text-decoration none;
+      font-family 'Righteous', cursive;
+      padding 3px 10px 3px 7px;
+      transition border-color 0.2s, background 0.2s, color 0.2s;
+      box-shadow 0 1px 4px rgba(129, 228, 162, 0.05);
+      background rgba(129, 228, 162, 0.05);
+    }
+    .all-list-footer-btnhover, .all-list-footer-btnfocus {
+      border-color #3ff5a8;
+      color #3ff5a8;
+      background rgba(129,228,162,0.10);
+    }
+    .all-list-footer-btn .material-icons {
+      font-size 17px;
+      vertical-align middle;
+    }
+    input[type=text], input[type=date] {
+      background #1e382a;
+      color white;
+      border 1px solid #81e4a2;
+      padding 5px;
+      border-radius 6px;
+      width 100%;
+    }
+    select {
+      background #1e382a;
+      color white;
+      border 1px solid #81e4a2;
+      padding 5px;
+      border-radius 6px;
+    }
+    .centered-btn {
+      display flex;
+      justify-content center;
+      margin-top 15px;
+    }
+    .status-title {
+      text-align center;
+      font-size 16px;
+      color #b9ffc9;
+      margin-bottom 15px;
+    }
+    .status-box {
+      margin-top 25px;
+      padding 15px;
+      background #112319;
+      border-radius 10px;
+      box-shadow 0 2px 10px rgba(0,255,100,0.15);
+    }
+    .item-list-btn {
+      flex 0 0 auto;
+      text-align center;
+      padding 6px 16px;
+      font-size 10px;
+      color white;
+      border 1px solid #81e4a2;
+      border-radius 6px;
+      background transparent;
+      cursor pointer;
+      transition all 0.2s ease-in-out;
+      white-space nowrap;
+    }
+    .item-list-btn.active {
+      background linear-gradient(135deg, #0e3c26, #1a6141);
+      border 1px solid #3ff5a8;
+      box-shadow 0 0 8px rgba(63, 245, 168, 0.25);
+    }
+    .row-selected {
+      background-color #2c5f47 !important;
+    }
+     Modal Styles 
+    .modal-overlay {
+      display flex;
+      position fixed;
+      z-index 1002;
+      left 0; top 0; right 0; bottom 0;
+      justify-content center;
+      align-items center;
+      background rgba(0,0,0,0.5);
+      animation fadeIn 0.2s;
+    }
+    @keyframes fadeIn {
+      from { opacity 0; }
+      to   { opacity 1; }
+    }
+    .modal-box {
+      background linear-gradient(135deg, #0e2013 90%, #1a6141 100%);
+      border-radius 14px;
+      box-shadow 0 6px 32px rgba(63,245,168,0.15);
+      padding 28px 22px 24px 22px;
+      width 300px;
+      min-width 220px;
+      position relative;
+      border 1.5px solid #3ff5a8;
+      display flex;
+      flex-direction column;
+      align-items stretch;
+      animation popupIn 0.2s;
+      z-index 1004;
+      margin-bottom 20vh;
+    }
+    #modalOverlayAddItem .modal-box {
+      width 220px;
+      min-width 0;
+      padding 18px 10px 14px 10px;
+    }
+    @media (max-width 600px) {
+      .modal-box {
+        width 98vw;
+        max-width 350px;
+        margin-bottom 25vh;
+      }
+      #modalOverlayAddItem .modal-box {
+        width 90vw;
+        max-width 260px;
+        margin-bottom 25vh;
+      }
+    }
+    @keyframes popupIn {
+      from { transform translateY(-20px) scale(0.95); opacity 0; }
+      to   { transform translateY(0) scale(1); opacity 1; }
+    }
+    .modal-title {
+      color #b9ffc9;
+      font-size 16px;
+      text-align left;
+      margin-bottom 18px;
+      letter-spacing 0.3px;
+    }
+    .modal-close {
+      position absolute;
+      right 14px;
+      top 10px;
+      font-size 18px;
+      color #81e4a2;
+      background none;
+      border none;
+      cursor pointer;
+      z-index 1;
+      transition color 0.2s;
+    }
+    .modal-closehover {
+      color #3ff5a8;
+    }
+    .modal-input, .modal-select {
+      border 1.5px solid;
+      border-image linear-gradient(135deg,#3ff5a8 60%,#112319 100%);
+      border-image-slice 1;
+      background linear-gradient(135deg,rgba(10,60,30,.3) 70%,rgba(18,100,80,.08));
+      color #b9ffc9;
+      font-size 14px;
+      padding 9px 12px;
+      margin-bottom 22px;
+      border-radius 7px;
+      outline none;
+      width 100%;
+      transition border-color 0.2s;
+    }
+    .modal-inputplaceholder {
+      color #81e4a2;
+      opacity 0.7;
+    }
+    .modal-btn-row {
+      display flex;
+      gap 12px;
+      margin-top 2px;
+      width 100%;
+      justify-content flex-end;
+    }
+    .modal-btn {
+      flex 1 1 0;
+      padding 7px 0;
+      font-size 13px;
+      border-radius 7px;
+      color #fff;
+      background transparent;
+      border 1.5px solid;
+      border-image linear-gradient(135deg,#3ff5a8 60%,#112319 100%);
+      border-image-slice 1;
+      cursor pointer;
+      transition background 0.18s, color 0.18s, border 0.18s;
+      font-family 'Righteous', cursive;
+      letter-spacing 0.2px;
+    }
+    .modal-btnactive, .modal-btn.pressed {
+      background linear-gradient(135deg,#0e3c26 50%,#1a6141 100%);
+      border-color #3ff5a8;
+      color #b9ffc9;
+    }
+    .modal-btn.update-btn {
+      margin-left 0;
+    }
+    .button-group-scroll-webkit-scrollbar {
+      height 7px;
+    }
+    .button-group-scroll-webkit-scrollbar-thumb {
+      background #81e4a2;
+      border-radius 4px;
+    }
+    .button-group-scroll-webkit-scrollbar-track {
+      background #15271c;
+    }
+    .table-action-btn-wrapper {
+      display flex;
+      gap 10px;
+    }
+    .table-action-btn {
+      display flex;
+      align-items center;
+      gap 3px;
+      background transparent;
+      border 1.2px solid #81e4a2;
+      color #81e4a2;
+      border-radius 7px;
+      font-size 13px;
+      cursor pointer;
+      padding 3px 10px 3px 7px;
+      font-family 'Righteous', cursive;
+      transition border-color 0.2s, background 0.2s, color 0.2s;
+      outline none;
+      box-shadow 0 1px 4px rgba(129, 228, 162, 0.05);
+      background rgba(129, 228, 162, 0.05);
+      margin-left 0;
+      margin-right 0;
+    }
+
+    .table-action-btnhover, .table-action-btnfocus {
+      border-color #3ff5a8;
+      color #3ff5a8;
+      background rgba(129,228,162,0.10);
+    }
+    .table-action-btn .material-icons {
+      font-size 17px;
+      vertical-align middle;
+    }
+     --- ADDED Toggle for ALL ITEM LIST --- 
+    .toggle-cell-2 {
+      margin 0 0 0 5px;
+      display flex;
+      align-items center;
+      justify-content flex-start;
+      width fit-content;
+      border-radius 14px;
+      background linear-gradient(135deg, rgba(129,228,162,0.18), rgba(34,66,50,0.35));
+      box-shadow 0 2px 20px rgba(129,228,162,0.04);
+      padding 5px 15px 5px 10px;
+      gap 11px;
+    }
+    .toggle-title-2 {
+      font-size 15px;
+      text-transform uppercase;
+      color #fff;
+      letter-spacing 1px;
+      font-family 'Righteous', cursive;
+      text-shadow 1px 1px 2px rgba(0,0,0,0.18);
+      margin 0;
+      padding 0 4px 0 0;
+      flex 1;
+      text-align left;
+      transition color 0.2s;
+    }
+    @media (max-width 600px) {
+      .toggle-cell-2 {
+        padding 2px 6px 2px 4px;
+        gap 7px;
+      }
+      .toggle-title-2 { font-size 13px; }
+    }
+    .all-list-footer {
+      display flex;
+      align-items flex-end;
+      justify-content space-between;
+      margin-top 15px;
+    }
+
+#modalOverlayAddItem .modal-box #modalAddItemName,
+#modalOverlayAddItem .modal-box #modalAddItemQty,
+#modalOverlayAddItem .modal-box #modalAddItemUnit {
+  width 340px;
+  min-width 0;
+  max-width 340vw;
+  box-sizing border-box;
+  border-radius 15px;  (if you want rounded corners too) 
+}
+
+#modalOverlayAddItem .modal-box {
+  width 380px;
+  min-width 0;
+  max-width 90vw;
+  margin 0 auto;
+}
+
+#modalOverlayAddItem .modal-input {
+  width 200px;
+  min-width 0;
+  box-sizing border-box;
+  display block;
+  margin-left auto;
+  margin-right auto;
+}
+
+
+#kitchenTableContainer th,
+#kitchenTableContainer td {
+  text-align center;
+  vertical-align middle;
+}
+
+#kitchenTableContainer thnth-child(3),
+#kitchenTableContainer tdnth-child(3) {
+  width 32%;     Quantity column - a bit wider 
+}
+
+#kitchenTableContainer thnth-child(4),
+#kitchenTableContainer tdnth-child(4) {
+  width 13%;     Units column - a bit narrower 
+}
+
+ Optionally, keep the others at a reasonable size 
+#kitchenTableContainer thnth-child(1),
+#kitchenTableContainer tdnth-child(1) {
+  width 35%;    Item Name 
+}
+#kitchenTableContainer thnth-child(2),
+#kitchenTableContainer tdnth-child(2) {
+  width 20%;    Checkbox 
+}
+
+#kitchenTableContainer tdnth-child(3) input[type=number] {
+  width 32px;
+  min-width 24px;
+  max-width 40px;
+  font-size 13px;
+  padding 3px 2px;
+  text-align center;
+}
+
+#kitchenTableContainer table {
+  table-layout fixed;
+  width 100%;
+}
+
+#kitchenTableContainer .quantity-controls {
+  display flex;
+  align-items center;
+  justify-content center;
+  width 100%;
+  gap 4px;
+  margin-left 2px;  -- This moves it a bit to the right 
+}
+
+#kitchenTableContainer table {
+  table-layout fixed;
+  width 100%;
+}
+
+#kitchenTableContainer .quantity-controls {
+  display flex;
+  align-items center;
+  justify-content center;
+  width 100%;
+  gap 4px;
+}
+
+  style
+head
+body
+  !-- PAGE 1 DASHBOARD --
+  div id=dashboardPage class=page-section active
+    div class=update-top
+      button class=update-btn-small onclick=showUpdatePage()Update Stockbutton
+    div
+
+    h1KITCHEN INVENTORYh1
+    div class=box-container id=inventoryBoxContainerdiv
+    div class=status-table
+      div class=status-row
+        div class=status-labelStatusdiv
+        div class=status-value id=dashboard-statusInventory Donediv
+      div
+      div class=status-row
+        div class=status-labelInventory Done Bydiv
+        div class=status-value id=dashboard-donebyJohn Doediv
+      div
+      div class=status-row
+        div class=status-labelUpdate Datediv
+        div class=status-value id=dashboard-date25 May 2025div
+      div
+      div class=status-row
+        div class=status-labelNotediv
+        div class=status-value id=note-valueEmptydiv
+      div
+    div
+    div class=toggle-cell
+      button class=toggle-btn id=toggleBtn aria-label=Toggle list type title=Toggle list type onclick=toggleListTitle()
+        svg id=toggleSwitch viewBox=0 0 34 20
+          rect x=2 y=2 width=30 height=16 rx=8 fill=#2e4d3a stroke=#81e4a2 stroke-width=2
+          circle id=toggleKnob cx=10 cy=10 r=6 fill=#fff stroke=#81e4a2 stroke-width=2
+        svg
+      button
+      span class=toggle-title id=listTitleWEEKLY LISTspan
+    div
+    div class=section-titleWeekly Listdiv
+div class=list-container id=selectedItemsOutputdiv
+  div
+
+  !-- PAGE 2 UPDATE STOCK --
+  div id=updatePage class=page-section
+    button class=back-button onclick=showDashboard() title=Backspan class=material-iconsarrow_backspanbutton
+    h2UPDATE INVENTORYh2
+    div class=button-group
+      button class=action-btn id=selectItemBtn onclick=activateButton(this, 'select')SELECT ITEMbutton
+      button class=action-btn onclick=activateButton(this, 'add')ADD ITEMSbutton
+      button class=action-btn onclick=activateButton(this, 'delete')DELETE ITEMSbutton
+      button class=action-btn onclick=activateButton(this, 'note')NOTEbutton
+    div
+    div class=element-box id=content-boxdiv
+    div class=status-box
+      div class=status-titleINVENTORY TASK STATUSdiv
+      div class=field-row
+        div class=section-labelSelect Employeediv
+        select id=employeeSelect onchange=toggleCustomName(this)
+          option value=-- Select --option
+          option value=AliceAliceoption
+          option value=BobBoboption
+          option value=CharlieCharlieoption
+          option value=Enter nameEnter nameoption
+        select
+      div
+      div class=field-row id=customNameRow style=display none;
+        input type=text id=customNameInput placeholder=Enter employee name
+      div
+      div class=field-row
+        div class=section-labelUpdate Datediv
+        input type=date id=statusDate 
+      div
+      div class=field-row
+        div class=section-labelInventory Statusdiv
+        select id=statusSelect
+          option value=-- Select --option
+          option value=DoneDoneoption
+          option value=PendingPendingoption
+        select
+      div
+      div class=centered-btn
+        button class=status-save-btn onclick=saveStatus()Save and Update Statusbutton
+      div
+    div
+    !-- ALL ITEM LIST SECTION --
+    div class=status-box
+      div class=section-header
+        div class=status-titleALL ITEM LISTdiv
+        div class=table-action-btn-wrapper
+          button class=table-action-btn onclick=showAddTableModal()
+            span class=material-icons aria-hidden=trueaddspan
+            Table
+          button
+          button class=table-action-btn onclick=showDeleteTableModal()
+            span class=material-icons aria-hidden=truedeletespan
+            Delete
+          button
+        div
+      div
+      div class=button-group-scroll id=tableBtnGroupdiv
+      div class=all-list-footer
+        div class=toggle-cell-2
+          button class=toggle-btn id=toggleBtn2 aria-label=Toggle table type title=Toggle table type onclick=toggleTableType()
+            svg id=toggleSwitch2 viewBox=0 0 34 20
+              rect x=2 y=2 width=30 height=16 rx=8 fill=#2e4d3a stroke=#81e4a2 stroke-width=2
+              circle id=toggleKnob2 cx=10 cy=10 r=6 fill=#fff stroke=#81e4a2 stroke-width=2
+            svg
+          button
+          span class=toggle-title-2 id=listTitle2WEEKLY TABLEspan
+        div
+        div class=all-list-footer-btns
+          button class=all-list-footer-btn onclick=showAddItemModal()
+            span class=material-icons aria-hidden=trueaddspan
+            Item
+          button
+          button class=all-list-footer-btn onclick=showDeleteItemModal()
+            span class=material-icons aria-hidden=truedeletespan
+            Delete
+          button
+        div
+      div
+    div
+    div id=kitchenTableContainer style=margin-top 15px;div
+    !-- Add Table Modal --
+    div id=modalOverlayAddTable class=modal-overlay style=display none;
+      div class=modal-box
+        button class=modal-close onclick=closeAddTableModal() title=Cancel&times;button
+        div class=modal-titleAdd Table Namediv
+        input id=modalTableName class=modal-input type=text placeholder=Enter Text maxlength=25 autocomplete=off 
+        div class=modal-btn-row
+          button class=modal-btn clear-btn onclick=clearAddTableModalInput()Clearbutton
+          button class=modal-btn update-btn onclick=addTableFromModal()Updatebutton
+        div
+      div
+    div
+    !-- Delete Table Modal --
+ !-- Delete Table Modal --
+div id=modalOverlayDeleteTable class=modal-overlay style=display none;
+  div class=modal-box
+    button class=modal-close onclick=closeDeleteTableModal() title=Cancel&times;button
+    div class=modal-titleDelete Tablediv
+    select id=modalDeleteTableSelect class=modal-select autocomplete=offselect
+    div class=modal-btn-row
+      button class=modal-btn clear-btn onclick=clearDeleteTableModalSelect()Clearbutton
+      button class=modal-btn update-btn onclick=deleteTableFromModal()Deletebutton
+    div
+  div
+div
+    !-- Add Item Modal --
+    div id=modalOverlayAddItem class=modal-overlay style=display none;
+      div class=modal-box
+        button class=modal-close onclick=closeAddItemModal() title=Cancel&times;button
+        div class=modal-titleAdd Itemdiv
+        input id=modalAddItemName class=modal-input type=text placeholder=Item Name maxlength=25 autocomplete=off 
+        input id=modalAddItemQty class=modal-input type=number placeholder=Quantity min=0 
+        input id=modalAddItemUnit class=modal-input type=text placeholder=Unit maxlength=12 autocomplete=off 
+        div class=modal-btn-row
+          button class=modal-btn clear-btn onclick=clearAddItemModalInput()Clearbutton
+          button class=modal-btn update-btn onclick=addItemFromModal()Updatebutton
+        div
+      div
+    div
+    !-- Delete Item Modal --
+  !-- Delete Item Modal --
+div id=modalOverlayDeleteItem class=modal-overlay style=display none;
+  div class=modal-box
+    button class=modal-close onclick=closeDeleteItemModal() title=Cancel&times;button
+    div class=modal-titleDelete Itemdiv
+    select id=modalDeleteItemSelect class=modal-select autocomplete=offselect
+    div class=modal-btn-row
+      button class=modal-btn clear-btn onclick=clearDeleteItemModalSelect()Clearbutton
+      button class=modal-btn update-btn onclick=deleteItemFromModal()Deletebutton
+    div
+  div
+div
+  div
+  script
+     --- SHARED DATA MODEL ---
+    let inventoryItems = [
+      { name CHICKEN AVAILABLE, value 12, unit Kg, lastUpdated 25 May },
+      { name LAMB AVAILABLE, value 8, unit Kg, lastUpdated 25 May },
+      { name SHRIMP AVAILABLE, value 5, unit Kg, lastUpdated 25 May },
+      { name FISH AVAILABLE, value 10, unit Kg, lastUpdated 25 May },
+      { name MILK AVAILABLE, value 20, unit L, lastUpdated 25 May }
+    ];
+    let statusInfo = {
+      status Inventory Done,
+      doneBy John Doe,
+      date 25 May 2025,
+      note localStorage.getItem('kitchenNote')  Empty
+    };
+    let dashboardLists = [
+      {
+        title Kitchen List,
+        id kitchen-table,
+        items [
+          { name Chicken, qty 12 Kg },
+          { name Rice, qty 5 Kg }
+        ]
+      },
+      {
+        title Drink List,
+        id drink-table,
+        items [
+          { name Milk, qty 20 L },
+          { name Juice, qty 10 L }
+        ]
+      },
+      {
+        title Other Items,
+        id other-table,
+        items [
+          { name Salt, qty 1 Kg },
+          { name Oil, qty 3 L }
+        ]
+      }
+    ];
+     --- ALL ITEM LIST DATA & LOGIC ---
+     Weekly Tables
+    let tableButtonsWeekly = [
+      {label Kitchen list, items [
+        { name Chicken, quantity 12, unit Kg, selected false },
+        { name Lamb, quantity 7, unit Kg, selected false }
+      ]},
+      {label Drink list, items [
+        { name Cola, quantity 24, unit Bottle, selected false },
+        { name Juice, quantity 15, unit Bottle, selected false }
+      ]},
+      {label Other items, items [
+        { name Napkins, quantity 100, unit Pack, selected false },
+        { name Plates, quantity 50, unit Piece, selected false }
+      ]}
+    ];
+     Daily Tables
+    let tableButtonsDaily = [
+      {label Kitchen list, items [
+        { name Chicken, quantity 2, unit Kg, selected false },
+        { name Lamb, quantity 1, unit Kg, selected false }
+      ]},
+      {label Drink list, items [
+        { name Cola, quantity 4, unit Bottle, selected false },
+        { name Juice, quantity 3, unit Bottle, selected false }
+      ]},
+      {label Other items, items [
+        { name Napkins, quantity 20, unit Pack, selected false },
+        { name Plates, quantity 10, unit Piece, selected false }
+      ]}
+    ];
+     Toggle state for weeklydaily tables
+    let dashboardTableType = localStorage.getItem('dashboardTableType')  weekly;
+let updateTableType = localStorage.getItem('updateTableType')  weekly;
+    function getCurrentTableButtons() {
+  return updateTableType === weekly  tableButtonsWeekly  tableButtonsDaily;
+}
+
+let activeTableIndexWeekly = 0;
+let activeTableIndexDaily = 0;
+function getActiveTableIndex() {
+  return updateTableType === weekly  activeTableIndexWeekly  activeTableIndexDaily;
+}
+function setActiveTableIndex(idx) {
+  if (updateTableType === weekly) activeTableIndexWeekly = idx;
+  else activeTableIndexDaily = idx;
+}
+
+     --- NAVIGATION ---
+    function showDashboard() {
+      document.getElementById('dashboardPage').classList.add('active');
+      document.getElementById('updatePage').classList.remove('active');
+      renderDashboard();
+    }
+    function showUpdatePage() {
+      document.getElementById('dashboardPage').classList.remove('active');
+      document.getElementById('updatePage').classList.add('active');
+      document.getElementById('selectItemBtn').click();
+      renderTableButtons();
+      renderTable();
+      document.getElementById('employeeSelect').value = ;
+      document.getElementById('statusDate').value = ;
+      document.getElementById('statusSelect').value = ;
+      document.getElementById('customNameRow').style.display = none;
+      setTableToggleVisual(tableType);
+    }
+
+     --- DASHBOARD RENDERING ---
+    function renderDashboard() {
+   Render inventory boxes as before
+  const boxCon = document.getElementById('inventoryBoxContainer');
+  boxCon.innerHTML = ;
+  inventoryItems.forEach(item = {
+    boxCon.innerHTML += `
+      div class=inventory-box
+        div class=box-title${item.name}div
+        divspan class=box-value${item.value}spanspan class=box-unit${item.unit}spandiv
+        div class=last-updated${item.lastUpdated}div
+      div
+    `;
+  });
+
+  document.getElementById('dashboard-status').innerText = statusInfo.status;
+  document.getElementById('dashboard-doneby').innerText = statusInfo.doneBy;
+  document.getElementById('dashboard-date').innerText = statusInfo.date;
+  document.getElementById('note-value').innerText = statusInfo.note  Empty;
+
+   --- NEW Dynamic Output Tables for Selected Items ---
+   Use global tableType for the current mode
+
+let tableButtons = dashboardTableType === weekly  tableButtonsWeekly  tableButtonsDaily;
+
+  let outputHtml = ;
+
+  tableButtons.forEach(table = {
+     Only show if at least one item is selected
+    const selectedItems = table.items.filter(item = item.selected);
+    if (selectedItems.length  0) {
+      outputHtml += `
+        div style=margin-bottom18px;
+          div style=font-size15px;font-weight700;color#bbffcc;margin-bottom6px;${table.label}div
+          table style=width100%;border-radius8px;overflowhidden;background#1a3024;
+            thead
+              tr
+                th style=background#26503a;color#b7ffd6;font-weight500;padding7px;Itemsth
+                th style=background#26503a;color#b7ffd6;font-weight500;padding7px;Quantityth
+              tr
+            thead
+            tbody
+              ${selectedItems.map(item = `
+                tr
+                  td style=color#eaffef;padding6px 10px;${item.name}td
+                  td style=color#eaffef;padding6px 10px;${item.quantity} ${item.unit}td
+                tr
+              `).join('')}
+            tbody
+          table
+        div
+      `;
+    }
+  });
+
+  document.getElementById('selectedItemsOutput').innerHTML = outputHtml;
+}
+    function copyTable(tableId) {
+      const table = document.getElementById(tableId);
+      let text = ;
+      for (let i = 1; i  table.rows.length; i++) {
+        let item = table.rows[i].cells[0].innerText;
+        let qty = table.rows[i].cells[1].innerText;
+        text += `${item} - ${qty}n`;
+      }
+      navigator.clipboard.writeText(text.trim())
+        .then(() = alert(List copied!))
+        .catch(err = alert(Copy failed));
+    }
+    function toggleListTitle() {
+  const titleEl = document.getElementById('listTitle');
+  const svg = document.getElementById('toggleSwitch');
+  const knob = document.getElementById('toggleKnob');
+  let isWeekly = dashboardTableType === weekly;
+  dashboardTableType = isWeekly  daily  weekly;
+  localStorage.setItem('dashboardTableType', dashboardTableType);
+  if (!titleEl  !svg  !knob) return;
+  if(dashboardTableType === daily) {
+    titleEl.innerText = 'DAILY LIST';
+    knob.setAttribute('cx', 24);
+    knob.setAttribute('fill', '#81e4a2');
+    svg.querySelector('rect').setAttribute('fill', '#264d38');
+    svg.querySelector('rect').setAttribute('stroke', '#81e4a2');
+  } else {
+    titleEl.innerText = 'WEEKLY LIST';
+    knob.setAttribute('cx', 10);
+    knob.setAttribute('fill', '#fff');
+    svg.querySelector('rect').setAttribute('fill', '#2e4d3a');
+    svg.querySelector('rect').setAttribute('stroke', '#81e4a2');
+  }
+  renderDashboard();
+}
+    document.addEventListener('DOMContentLoaded', function() {
+   Set dashboard toggle knob position
+  const knob = document.getElementById('toggleKnob');
+  if (dashboardTableType === weekly) {
+    knob.setAttribute('cx', 10);
+    knob.setAttribute('fill', '#fff');
+  } else {
+    knob.setAttribute('cx', 24);
+    knob.setAttribute('fill', '#81e4a2');
+  }
+  renderDashboard();
+
+  setTableToggleVisual(updateTableType);
+  renderTableButtons();
+  renderTable();
+});
+
+     --- PAGE 2 TOGGLE BUTTON LOGIC (DAILYWEEKLY TABLES) --- 
+    function toggleTableType() {
+  updateTableType = (updateTableType === weekly)  daily  weekly;
+  localStorage.setItem('updateTableType', updateTableType);
+
+  setTableToggleVisual(updateTableType);
+  renderTableButtons();
+  renderTable();
+   Do NOT call renderDashboard() here!
+}
+    function setTableToggleVisual(type) {
+      const titleEl = document.getElementById('listTitle2');
+      const svg = document.getElementById('toggleSwitch2');
+      const knob = document.getElementById('toggleKnob2');
+      if (!titleEl  !svg  !knob) return;
+      if(type === weekly) {
+        titleEl.innerText = 'WEEKLY TABLE';
+        knob.setAttribute('cx', 10);
+        knob.setAttribute('fill', '#fff');
+        svg.querySelector('rect').setAttribute('fill', '#2e4d3a');
+        svg.querySelector('rect').setAttribute('stroke', '#81e4a2');
+      } else {
+        titleEl.innerText = 'DAILY TABLE';
+        knob.setAttribute('cx', 24);
+        knob.setAttribute('fill', '#81e4a2');
+        svg.querySelector('rect').setAttribute('fill', '#264d38');
+        svg.querySelector('rect').setAttribute('stroke', '#81e4a2');
+      }
+    }
+
+     --- ALL ITEM LIST LOGIC (PAGE 2 TABLES) ---
+    function renderTableButtons() {
+      const btnGroup = document.getElementById('tableBtnGroup');
+      btnGroup.innerHTML = '';
+      const tableButtons = getCurrentTableButtons();
+      const activeTableIndex = getActiveTableIndex();
+      tableButtons.forEach((tb, idx) = {
+        const btn = document.createElement('button');
+        btn.className = 'item-list-btn';
+        btn.textContent = tb.label;
+        btn.onclick = () = { toggleActive(btn, idx); };
+        if (idx === activeTableIndex) btn.classList.add('active');
+        btnGroup.appendChild(btn);
+      });
+      btnGroup.lastChild && btnGroup.lastChild.scrollIntoView({behavior 'smooth', inline 'end'});
+    }
+    function toggleActive(button, idx) {
+      const btnGroup = document.getElementById('tableBtnGroup');
+      Array.from(btnGroup.children).forEach((btn, i) = {
+        btn.classList.toggle('active', btn === button);
+        if (btn === button) setActiveTableIndex(i);
+      });
+      renderTable();
+    }
+    function renderTable() {
+      const tableContainer = document.getElementById('kitchenTableContainer');
+      const tableButtons = getCurrentTableButtons();
+      const activeTableIndex = getActiveTableIndex();
+      const items = tableButtons[activeTableIndex].items  [];
+      if (!items.length) {
+        tableContainer.innerHTML = '';
+        return;
+      }
+      const rows = items.map((item, idx) = `
+  tr class=${item.selected  row-selected  } onclick=selectRow(${idx}, this)
+    td${item.name}td
+    td onclick=event.stopPropagation();
+      input type=checkbox ${item.selected  checked  } onclick=toggleRowCheckbox(event, ${idx}, this)
+    td
+    td
+      div class=quantity-controls
+        button class=value-btn onclick=changeQuantity(this, -1, ${idx})−button
+        input type=number value=${item.quantity} min=0 style=width 50px; text-align center; background-color #2c5f47; border none; color white; onchange=changeQuantityInput(this, ${idx})
+        button class=value-btn onclick=changeQuantity(this, 1, ${idx})+button
+      div
+    td
+    td${item.unit}td
+  tr
+`).join('');
+      tableContainer.innerHTML = `
+        table style=
+          width 100%;
+          border-collapse separate;
+          border-radius 10px;
+          overflow hidden;
+          background-color #1e382a;
+          box-shadow 0 2px 8px rgba(0, 255, 100, 0.1);
+          border none;
+        
+          thead
+            tr style=font-size 12px; color #b9ffc9; text-align left;
+              th style=padding 10px;Item Nameth
+              th style=padding 10px;Checkboxth
+              th style=padding 10px;Quantityth
+              th style=padding 10px;Unitsth
+            tr
+          thead
+          tbody
+            ${rows}
+          tbody
+        table
+      `;
+    }
+    function toggleRowSelection(checkbox, idx) {
+      const tableButtons = getCurrentTableButtons();
+      const activeTableIndex = getActiveTableIndex();
+      const items = tableButtons[activeTableIndex].items;
+      items[idx].selected = checkbox.checked;
+      const row = checkbox.closest('tr');
+      if (checkbox.checked) {
+        row.classList.add('row-selected');
+      } else {
+        row.classList.remove('row-selected');
+      }
+
+renderDashboard();
+
+    }
+    function changeQuantity(button, delta, idx) {
+  const tableButtons = getCurrentTableButtons();
+  const activeTableIndex = getActiveTableIndex();
+  const items = tableButtons[activeTableIndex].items;
+  let newValue = Math.max(0, (parseInt(items[idx].quantity)  0) + delta);
+  items[idx].quantity = newValue;
+  renderTable();
+
+}
+     --- Modal logic for AddDelete TableItem ---
+    function showAddTableModal() {
+      document.getElementById('modalOverlayAddTable').style.display = flex;
+      setTimeout(() = {
+        const field = document.getElementById('modalTableName');
+        field.value = ;
+        field.focus();
+        field.scrollIntoView({block'center',behavior'smooth'});
+      }, 120);
+    }
+    function closeAddTableModal() {
+      document.getElementById('modalOverlayAddTable').style.display = none;
+    }
+    function clearAddTableModalInput() {
+      document.getElementById('modalTableName').value = ;
+      document.getElementById('modalTableName').focus();
+    }
+    function addTableFromModal() {
+      const tableNameInput = document.getElementById('modalTableName');
+      let name = tableNameInput.value.trim();
+      if (!name) {
+        tableNameInput.focus();
+        tableNameInput.style.borderColor = #f77;
+        setTimeout(()={tableNameInput.style.borderColor=;},600);
+        return;
+      }
+      const tableButtons = getCurrentTableButtons();
+      if (tableButtons.some(tb = tb.label.toLowerCase() === name.toLowerCase())) {
+        alert(Table name already exists!);
+        tableNameInput.focus();
+        return;
+      }
+      tableButtons.push({label name, items []});
+      setActiveTableIndex(tableButtons.length - 1);
+      renderTableButtons();
+      renderTable();
+      closeAddTableModal();
+    }
+    function showDeleteTableModal() {
+      const select = document.getElementById('modalDeleteTableSelect');
+      select.innerHTML = '';
+      const tableButtons = getCurrentTableButtons();
+      tableButtons.forEach((tb, idx) = {
+        if (idx = 3) select.innerHTML += `option value=${idx}${tb.label}option`;
+      });
+      document.getElementById('modalOverlayDeleteTable').style.display = flex;
+      setTimeout(() = {
+        select.focus();
+        select.scrollIntoView({block'center',behavior'smooth'});
+      }, 120);
+    }
+    function closeDeleteTableModal() {
+      document.getElementById('modalOverlayDeleteTable').style.display = none;
+    }
+    function clearDeleteTableModalSelect() {
+      document.getElementById('modalDeleteTableSelect').selectedIndex = -1;
+      document.getElementById('modalDeleteTableSelect').focus();
+    }
+    function deleteTableFromModal() {
+      const select = document.getElementById('modalDeleteTableSelect');
+      if (select.selectedIndex === -1) {
+        select.focus();
+        select.style.borderColor = #f77;
+        setTimeout(()={select.style.borderColor=;},600);
+        return;
+      }
+      const tableButtons = getCurrentTableButtons();
+      const idx = parseInt(select.value, 10);
+      if (isNaN(idx)  idx  3  idx = tableButtons.length) return;
+      if (confirm(`Delete table ${tableButtons[idx].label} This cannot be undone.`)) {
+        tableButtons.splice(idx, 1);
+        if (getActiveTableIndex() = idx) setActiveTableIndex(Math.max(0, getActiveTableIndex() - 1));
+        renderTableButtons();
+        renderTable();
+        closeDeleteTableModal();
+      }
+    }
+    function showAddItemModal() {
+      document.getElementById('modalOverlayAddItem').style.display = flex;
+      setTimeout(() = {
+        const field = document.getElementById('modalAddItemName');
+        field.value = ; document.getElementById('modalAddItemQty').value = ;
+        document.getElementById('modalAddItemUnit').value = ;
+        field.focus();
+        field.scrollIntoView({block'center',behavior'smooth'});
+      }, 120);
+    }
+    function closeAddItemModal() {
+      document.getElementById('modalOverlayAddItem').style.display = none;
+    }
+    function clearAddItemModalInput() {
+      document.getElementById('modalAddItemName').value = ;
+      document.getElementById('modalAddItemQty').value = ;
+      document.getElementById('modalAddItemUnit').value = ;
+      document.getElementById('modalAddItemName').focus();
+    }
+    function addItemFromModal() {
+      const name = document.getElementById('modalAddItemName').value.trim();
+      const qty = document.getElementById('modalAddItemQty').value;
+      const unit = document.getElementById('modalAddItemUnit').value.trim();
+      if (!name  !unit) {
+        alert(Enter all fields.);
+        return;
+      }
+      const tableButtons = getCurrentTableButtons();
+      const activeTableIndex = getActiveTableIndex();
+      tableButtons[activeTableIndex].items.push({name, quantity parseInt(qty)  0, unit, selected false});
+      renderTable();
+      closeAddItemModal();
+    }
+    
+
+function changeQuantityInput(input, idx) {
+  const tableButtons = getCurrentTableButtons();
+  const activeTableIndex = getActiveTableIndex();
+  const items = tableButtons[activeTableIndex].items;
+  let value = parseInt(input.value)  0;
+  if (value  0) value = 0;
+  items[idx].quantity = value;
+  renderTable();
+}
+
+function showDeleteItemModal() {
+      const select = document.getElementById('modalDeleteItemSelect');
+      select.innerHTML = '';
+      const tableButtons = getCurrentTableButtons();
+      const activeTableIndex = getActiveTableIndex();
+      const items = tableButtons[activeTableIndex].items  [];
+      items.forEach((item, idx) = {
+        select.innerHTML += `option value=${idx}${item.name}option`;
+      });
+      document.getElementById('modalOverlayDeleteItem').style.display = flex;
+      setTimeout(() = {
+        select.focus();
+        select.scrollIntoView({block'center',behavior'smooth'});
+      }, 120);
+    }
+    function closeDeleteItemModal() {
+      document.getElementById('modalOverlayDeleteItem').style.display = none;
+    }
+    function clearDeleteItemModalSelect() {
+      document.getElementById('modalDeleteItemSelect').selectedIndex = -1;
+      document.getElementById('modalDeleteItemSelect').focus();
+    }
+
+function selectRow(idx, row) {
+  const tableButtons = getCurrentTableButtons();
+  const activeTableIndex = getActiveTableIndex();
+  const items = tableButtons[activeTableIndex].items;
+  items[idx].selected = !items[idx].selected;
+  renderTable();
+
+renderDashboard();
+
+}
+
+function toggleRowCheckbox(event, idx, checkbox) {
+  event.stopPropagation();  Prevents triggering row click
+  const tableButtons = getCurrentTableButtons();
+  const activeTableIndex = getActiveTableIndex();
+  const items = tableButtons[activeTableIndex].items;
+  items[idx].selected = checkbox.checked;
+  renderTable();
+
+renderDashboard();
+
+}
+
+
+    function deleteItemFromModal() {
+      const select = document.getElementById('modalDeleteItemSelect');
+      if (select.selectedIndex === -1) {
+        select.focus();
+        select.style.borderColor = #f77;
+        setTimeout(()={select.style.borderColor=;},600);
+        return;
+      }
+      const tableButtons = getCurrentTableButtons();
+      const activeTableIndex = getActiveTableIndex();
+      const items = tableButtons[activeTableIndex].items;
+      if (!items) return;
+      const idx = parseInt(select.value, 10);
+      const name = items[idx].name;
+      if (confirm(`Delete item ${name}`)) {
+        items.splice(idx, 1);
+        renderTable();
+        closeDeleteItemModal();
+      }
+    }
+    document.addEventListener('keydown', function(e){
+      if (e.key === Escape) {
+        closeAddTableModal();
+        closeDeleteTableModal();
+        closeAddItemModal();
+        closeDeleteItemModal();
+      }
+    });
+    [
+      ['modalOverlayAddTable', closeAddTableModal],
+      ['modalOverlayDeleteTable', closeDeleteTableModal],
+      ['modalOverlayAddItem', closeAddItemModal],
+      ['modalOverlayDeleteItem', closeDeleteItemModal]
+    ].forEach(([id, closeFn]) = {
+      document.getElementById(id).addEventListener('mousedown', function(e){
+        if (e.target === this) closeFn();
+      });
+    });
+    window.addEventListener('DOMContentLoaded', function() {
+      renderTableButtons();
+      renderTable();
+      document.getElementById('selectItemBtn').click();
+      setTableToggleVisual(tableType);
+    });
+     --- UPDATE PAGE SELECTADDDELETENOTE --- (unchanged)
+    let selectState = { selectedItem null };
+    function activateButton(button, mode='') {
+      document.querySelectorAll('.action-btn').forEach(btn = btn.classList.remove('active'));
+      button.classList.add('active');
+      if (mode === 'select') renderSelectItemUI();
+      else if (mode === 'add') renderAddItemUI();
+      else if (mode === 'delete') renderDeleteItemUI();
+      else if (mode === 'note') renderNoteUI();
+      else document.getElementById('content-box').innerHTML = '';
+    }
+    function renderSelectItemUI() {
+      let thisItem = null;
+      if (selectState.selectedItem) {
+        thisItem = inventoryItems.find(it = it.name === selectState.selectedItem);
+      }
+      document.getElementById('content-box').innerHTML = `
+        div class=section-header
+          div class=section-label id=item-name${thisItem  thisItem.name  Select Item}div
+          button class=change-select onclick=showDropdown()Changebutton
+        div
+        div id=dropdown-list style=display none; margin-bottom 12px;
+          select onchange=changeItem(this.value) style=width 100%;
+            option value= ${!selectState.selectedItem  selected  }Select Itemoption
+            ${inventoryItems.map(item = `option${item.name===selectState.selectedItem' selected'''}${item.name}option`).join('')}
+          select
+        div
+        div class=field-row
+          div class=section-labelValuediv
+          div class=value-controls
+            button class=value-btn onclick=adjustValue(-1)-button
+            input type=number id=valueInput value=${thisItem  thisItem.value  0} class=number-input 
+            button class=value-btn onclick=adjustValue(1)+button
+          div
+        div
+        div class=field-row
+          div class=section-labelUnitsdiv
+          select id=unitSelect class=unit-select
+            option${thisItem&&thisItem.unit==Kg selected}Kgoption
+            option${thisItem&&(thisItem.unit==LthisItem.unit==Litre) selected}Litreoption
+          select
+          button class=update-btn style=margin-leftauto; onclick=updateItem()Updatebutton
+        div
+      `;
+    }
+    function showDropdown() {
+      const dropdown = document.getElementById('dropdown-list');
+      dropdown.style.display = dropdown.style.display === 'none'  'block'  'none';
+    }
+    function changeItem(value) {
+      if (value && value !== Select Item) selectState.selectedItem = value;
+      else selectState.selectedItem = null;
+      renderSelectItemUI();
+    }
+    function adjustValue(amount) {
+      const input = document.getElementById('valueInput');
+      let current = parseInt(input.value)  0;
+      input.value = Math.max(0, current + amount);
+    }
+    function updateItem() {
+      if (!selectState.selectedItem) {
+        alert(Select an item first!);
+        return;
+      }
+      const idx = inventoryItems.findIndex(it = it.name === selectState.selectedItem);
+      if (idx = 0) {
+        inventoryItems[idx].value = parseInt(document.getElementById('valueInput').value)  0;
+        inventoryItems[idx].unit = document.getElementById('unitSelect').value;
+        inventoryItems[idx].lastUpdated = new Date().toLocaleDateString('en-GB', { day 'numeric', month 'short' });
+        alert(`${selectState.selectedItem} updated to ${inventoryItems[idx].value} ${inventoryItems[idx].unit}`);
+        renderDashboard();
+      }
+    }
+    function renderAddItemUI() {
+      document.getElementById('content-box').innerHTML = `
+        div class=field-row
+          div class=section-labelItem Namediv
+          input type=text id=newItemName placeholder=Enter name
+        div
+        div class=field-row
+          div class=section-labelValuediv
+          div class=value-controls
+            button class=value-btn onclick=adjustNewValue(-1)-button
+            input type=number id=newValueInput value=0 class=number-input 
+            button class=value-btn onclick=adjustNewValue(1)+button
+          div
+        div
+        div class=field-row
+          div class=section-labelUnitsdiv
+          select id=newUnitSelect class=unit-select
+            optionKgoption
+            optionLitreoption
+            optionEnter Textoption
+          select
+          input type=text id=customUnitInput style=displaynone;margin-left8px;width60px; placeholder=Text maxlength=12
+          button class=update-btn style=margin-leftauto; onclick=createNewBox()Updatebutton
+        div
+      `;
+      document.getElementById('newUnitSelect').addEventListener('change', function() {
+        document.getElementById('customUnitInput').style.display =
+          this.value === 'Enter Text'  'inline-block'  'none';
+      });
+    }
+    function adjustNewValue(amount) {
+      const input = document.getElementById('newValueInput');
+      let current = parseInt(input.value)  0;
+      input.value = Math.max(0, current + amount);
+    }
+    function createNewBox() {
+      const newItemName = document.getElementById('newItemName').value.trim();
+      let unit = document.getElementById('newUnitSelect').value;
+      if (unit === Enter Text) {
+        unit = document.getElementById('customUnitInput').value.trim()  Unit;
+      }
+      const value = parseInt(document.getElementById('newValueInput').value)  0;
+      if (!newItemName) {
+        alert('Please enter a name for the new item.');
+        return;
+      }
+      inventoryItems.push({
+        name newItemName,
+        value value,
+        unit unit,
+        lastUpdated new Date().toLocaleDateString('en-GB', { day 'numeric', month 'short' })
+      });
+      alert(`New item '${newItemName}' added with value ${value} ${unit}`);
+      renderDashboard();
+      document.getElementById('newItemName').value = '';
+      document.getElementById('newValueInput').value = 0;
+      document.getElementById('newUnitSelect').selectedIndex = 0;
+      document.getElementById('customUnitInput').value = '';
+      document.getElementById('customUnitInput').style.display = 'none';
+    }
+    function renderDeleteItemUI() {
+      document.getElementById('content-box').innerHTML = `
+        div class=field-row
+          div class=section-labelSelectdiv
+          select id=deleteItemSelect class=unit-select style=flex 1;
+            ${inventoryItems.map(item = `option${item.name}option`).join('')}
+          select
+        div
+        div class=centered-btn
+          button class=delete-btn onclick=deleteItem()Deletebutton
+        div
+      `;
+    }
+    function deleteItem() {
+      const itemName = document.getElementById('deleteItemSelect').value;
+      const idx = inventoryItems.findIndex(it = it.name === itemName);
+      if (idx = 0) {
+        if (confirm(`Delete ${itemName}`)) {
+          inventoryItems.splice(idx, 1);
+          renderDashboard();
+          alert(`${itemName} deleted.`);
+          renderDeleteItemUI();
+        }
+      }
+    }
+    function renderNoteUI() {
+      document.getElementById('content-box').innerHTML = `
+        div style=border 1.5px solid #81e4a2; background linear-gradient(135deg, #0a1b0d, #06200f);
+          box-shadow 0 4px 8px rgba(129, 228, 162, 0.3); border-radius 10px; padding 12px; color white;
+          font-family 'Righteous', cursive; font-size 14px; min-height 100px; display flex;
+          flex-direction column; justify-content space-between;
+          textarea id=noteText placeholder=empty paragraph text (empty lines)
+            style=background transparent; color white; border none; resize none; outline none;
+            font-family 'Righteous', cursive; flex-grow 1; margin-bottom 10px; line-height 1.4; rows=3textarea
+          button id=noteUpdateBtn style=align-self center; padding 6px 16px; border 1.5px solid #81e4a2;
+            background transparent; border-radius 8px; color white; font-size 14px; cursor pointer;
+            transition all 0.3s ease; width 100px;Updatebutton
+        div
+      `;
+      const updateBtn = document.getElementById('noteUpdateBtn');
+      updateBtn.addEventListener('click', () = {
+        updateBtn.classList.add('pressed');
+        const noteText = document.getElementById('noteText').value.trim();
+        statusInfo.note = noteText  Empty;
+        localStorage.setItem('kitchenNote', statusInfo.note);
+        renderDashboard();
+        alert('Note updated.');
+        setTimeout(() = {
+          updateBtn.classList.remove('pressed');
+          document.getElementById('noteText').value = '';
+        }, 1000);
+      });
+    }
+    function toggleCustomName(select) {
+      document.getElementById('customNameRow').style.display = select.value === 'Enter name'  'block'  'none';
+    }
+    function saveStatus() {
+      const employeeSelect = document.getElementById('employeeSelect');
+      const employee = employeeSelect.value === 'Enter name'
+         document.getElementById('customNameInput').value.trim()
+         employeeSelect.value;
+      const date = document.getElementById('statusDate').value;
+      const status = document.getElementById('statusSelect').value;
+      if (!employee  !date  !status) {
+        alert('Please fill all required fields.');
+        return;
+      }
+      statusInfo.doneBy = employee;
+      statusInfo.date = new Date(date).toLocaleDateString('en-GB', { day 'numeric', month 'short', year 'numeric' });
+      statusInfo.status = Inventory  + status;
+      renderDashboard();
+      alert(`Status saved ${employee}, ${date}, ${status}`);
+    }
+  script
+body
+html
