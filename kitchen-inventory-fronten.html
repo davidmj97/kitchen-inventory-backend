@@ -898,39 +898,169 @@ Delete
 </div>
 <script>
 // --- SHARED DATA MODEL ---
-const backendUrl = 'https://YOUR-BACKEND-ON-RENDER.onrender.com'; // change to your actual URL
+// --- SHARED DATA MODEL (with backend integration) ---
+const backendUrl = 'https://kitchen-inventory-backend.onrender.com'; // <-- CHANGE THIS TO YOUR ACTUAL URL
+
+let statusInfo = {
+  status: "Inventory Done",
+  doneBy: "John Doe",
+  date: "25 May 2025",
+  note: localStorage.getItem('kitchenNote') || "Empty"
+};
+
+// --- ALL ITEM LIST DATA & LOGIC ---
+// Weekly and Daily tables remain local (OPTIONAL: move these to backend later)
+let tableButtonsWeekly = [
+  { label: "Kitchen list", items: [
+    { name: "Chicken", quantity: 12, unit: "Kg", selected: false },
+    { name: "Lamb", quantity: 7, unit: "Kg", selected: false }
+  ]},
+  { label: "Drink list", items: [
+    { name: "Cola", quantity: 24, unit: "Bottle", selected: false },
+    { name: "Juice", quantity: 15, unit: "Bottle", selected: false }
+  ]},
+  { label: "Other items", items: [
+    { name: "Napkins", quantity: 100, unit: "Pack", selected: false },
+    { name: "Plates", quantity: 50, unit: "Piece", selected: false }
+  ]}
+];
+let tableButtonsDaily = [
+  { label: "Kitchen list", items: [
+    { name: "Chicken", quantity: 2, unit: "Kg", selected: false },
+    { name: "Lamb", quantity: 1, unit: "Kg", selected: false }
+  ]},
+  { label: "Drink list", items: [
+    { name: "Cola", quantity: 4, unit: "Bottle", selected: false },
+    { name: "Juice", quantity: 3, unit: "Bottle", selected: false }
+  ]},
+  { label: "Other items", items: [
+    { name: "Napkins", quantity: 20, unit: "Pack", selected: false },
+    { name: "Plates", quantity: 10, unit: "Piece", selected: false }
+  ]}
+];
+
+let dashboardTableType = localStorage.getItem('dashboardTableType') || "weekly";
+let updateTableType = localStorage.getItem('updateTableType') || "weekly";
+function getCurrentTableButtons() {
+  return updateTableType === "weekly" ? tableButtonsWeekly : tableButtonsDaily;
+}
+let activeTableIndexWeekly = 0;
+let activeTableIndexDaily = 0;
+function getActiveTableIndex() {
+  return updateTableType === "weekly" ? activeTableIndexWeekly : activeTableIndexDaily;
+}
+function setActiveTableIndex(idx) {
+  if (updateTableType === "weekly") activeTableIndexWeekly = idx;
+  else activeTableIndexDaily = idx;
+}
+
+// --- NAVIGATION ---
+function showDashboard() {
+  document.getElementById('dashboardPage').classList.add('active');
+  document.getElementById('updatePage').classList.remove('active');
+  renderDashboard();
+}
+function showUpdatePage() {
+  document.getElementById('dashboardPage').classList.remove('active');
+  document.getElementById('updatePage').classList.add('active');
+  document.getElementById('selectItemBtn').click();
+  renderTableButtons();
+  renderTable();
+  document.getElementById('employeeSelect').value = "";
+  document.getElementById('statusDate').value = "";
+  document.getElementById('statusSelect').value = "";
+  document.getElementById('customNameRow').style.display = "none";
+  setTableToggleVisual(updateTableType);
+}
+
+// --- BACKEND FETCH HELPERS ---
+async function fetchInventory() {
+  const res = await fetch(`${backendUrl}/api/items`);
+  return await res.json(); // {id: {...}, ...}
+}
+async function addInventoryItem(item) {
+  await fetch(`${backendUrl}/api/items`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(item)
+  });
+}
+async function updateInventoryItem(id, item) {
+  await fetch(`${backendUrl}/api/items/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(item)
+  });
+}
+async function deleteInventoryItem(id) {
+  await fetch(`${backendUrl}/api/items/${id}`, {
+    method: "DELETE"
+  });
+}
+
+// --- DASHBOARD RENDERING ---
+async function renderDashboard() {
+  // Fetch inventory from backend
+  const boxCon = document.getElementById('inventoryBoxContainer');
+  boxCon.innerHTML = "";
+  const data = await fetchInventory();
+  const inventoryItems = data ? Object.values(data) : [];
+  inventoryItems.forEach(item => {
+    boxCon.innerHTML += `
+      <div class="inventory-box">
+        <div class="box-title">${item.name}</div>
+        <div><span class="box-value">${item.value}</span><span class="box-unit">${item.unit}</span></div>
+        <div class="last-updated">${item.lastUpdated || ''}</div>
+      </div>
+    `;
+  });
+
+  // --- NEW: Dynamic Output Tables for Selected Items ---
+  let tableButtons = dashboardTableType === "weekly" ? tableButtonsWeekly : tableButtonsDaily;
+  let outputHtml = "";
+  tableButtons.forEach(table => {
+    const selectedItems = table.items.filter(item => item.selected);
+    if (selectedItems.length > 0) {
+      outputHtml += `
+        <div style="margin-bottom:18px;">
+          <div style="font-size:15px;font-weight:700;color:#bbffcc;margin-bottom:6px;">${table.label}</div>
+          <table style="width:100%;border-radius:8px;overflow:hidden;background:#1a3024;">
+            <thead>
+              <tr>
+                <th style="background:#26503a;color:#b7ffd6;font-weight:500;padding:7px;">Items</th>
+                <th style="background:#26503a;color:#b7ffd6;font-weight:500;padding:7px;">Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${selectedItems.map(item => `
+                <tr>
+                  <td style="color:#eaffef;padding:6px 10px;">${item.name}</td>
+                  <td style="color:#eaffef;padding:6px 10px;">${item.quantity} ${item.unit}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+  });
+  document.getElementById('selectedItemsOutput').innerHTML = outputHtml;
+
+  // Status
+  document.getElementById('dashboard-status').innerText = statusInfo.status;
+  document.getElementById('dashboard-doneby').innerText = statusInfo.doneBy;
+  document.getElementById('dashboard-date').innerText = statusInfo.date;
+  document.getElementById('note-value').innerText = statusInfo.note || "Empty";
+}
+
+
 let statusInfo = {
 status: "Inventory Done",
 doneBy: "John Doe",
 date: "25 May 2025",
 note: localStorage.getItem('kitchenNote') || "Empty"
 };
-let dashboardLists = [
-{
-title: "Kitchen List",
-id: "kitchen-table",
-items: [
-{ name: "Chicken", qty: "12 Kg" },
-{ name: "Rice", qty: "5 Kg" }
-]
-},
-{
-title: "Drink List",
-id: "drink-table",
-items: [
-{ name: "Milk", qty: "20 L" },
-{ name: "Juice", qty: "10 L" }
-]
-},
-{
-title: "Other Items",
-id: "other-table",
-items: [
-{ name: "Salt", qty: "1 Kg" },
-{ name: "Oil", qty: "3 L" }
-]
-}
-];
+
 // --- ALL ITEM LIST DATA & LOGIC ---
 // Weekly Tables
 let tableButtonsWeekly = [
