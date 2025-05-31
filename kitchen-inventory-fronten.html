@@ -1003,69 +1003,6 @@ async function renderDashboard() {
 
 
 
-// --- DASHBOARD RENDERING ---
-async function renderDashboard() {
-// Fetch inventory from backend
-const boxCon = document.getElementById('inventoryBoxContainer');
-boxCon.innerHTML = "";
-const res = await fetch(`${backendUrl}/api/items`);
-const data = await res.json(); // data is an object: { id1: {...}, id2: {...} }
-// Convert object to array for rendering
-const inventoryItems = Object.values(data || {});
-inventoryItems.forEach(item => {
-boxCon.innerHTML += `
-<div class="inventory-box">
-<div class="box-title">${item.name}</div>
-<div><span class="box-value">${item.value}</span><span class="box-unit">${item.unit}</span></div>
-<div class="last-updated">${item.lastUpdated || ''}</div>
-</div>
-`;
-});
-
-
-
-document.getElementById('dashboard-status').innerText = statusInfo.status;
-document.getElementById('dashboard-doneby').innerText = statusInfo.doneBy;
-document.getElementById('dashboard-date').innerText = statusInfo.date;
-document.getElementById('note-value').innerText = statusInfo.note || "Empty";
-}
-// --- NEW: Dynamic Output Tables for Selected Items ---
-// Use global tableType for the current mode
-
-let tableButtons = dashboardTableType === "weekly" ? tableButtonsWeekly : tableButtonsDaily;
-
-let outputHtml = "";
-
-tableButtons.forEach(table => {
-// Only show if at least one item is selected
-const selectedItems = table.items.filter(item => item.selected);
-if (selectedItems.length > 0) {
-outputHtml += `
-<div style="margin-bottom:18px;">
-<div style="font-size:15px;font-weight:700;color:#bbffcc;margin-bottom:6px;">${table.label}</div>
-<table style="width:100%;border-radius:8px;overflow:hidden;background:#1a3024;">
-<thead>
-<tr>
-<th style="background:#26503a;color:#b7ffd6;font-weight:500;padding:7px;">Items</th>
-<th style="background:#26503a;color:#b7ffd6;font-weight:500;padding:7px;">Quantity</th>
-</tr>
-</thead>
-<tbody>
-${selectedItems.map(item => `
-<tr>
-<td style="color:#eaffef;padding:6px 10px;">${item.name}</td>
-<td style="color:#eaffef;padding:6px 10px;">${item.quantity} ${item.unit}</td>
-</tr>
-`).join('')}
-</tbody>
-</table>
-</div>
-`;
-}
-});
-
-document.getElementById('selectedItemsOutput').innerHTML = outputHtml;
-}
 function copyTable(tableId) {
 const table = document.getElementById(tableId);
 let text = "";
