@@ -1003,25 +1003,6 @@ async function renderDashboard() {
 
 
 
-// --- NAVIGATION ---
-function showDashboard() {
-document.getElementById('dashboardPage').classList.add('active');
-document.getElementById('updatePage').classList.remove('active');
-renderDashboard();
-}
-function showUpdatePage() {
-document.getElementById('dashboardPage').classList.remove('active');
-document.getElementById('updatePage').classList.add('active');
-document.getElementById('selectItemBtn').click();
-renderTableButtons();
-renderTable();
-document.getElementById('employeeSelect').value = "";
-document.getElementById('statusDate').value = "";
-document.getElementById('statusSelect').value = "";
-document.getElementById('customNameRow').style.display = "none";
-setTableToggleVisual(tableType);
-}
-
 // --- DASHBOARD RENDERING ---
 async function renderDashboard() {
 // Fetch inventory from backend
