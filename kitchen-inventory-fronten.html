@@ -1002,60 +1002,6 @@ async function renderDashboard() {
 }
 
 
-let statusInfo = {
-status: "Inventory Done",
-doneBy: "John Doe",
-date: "25 May 2025",
-note: localStorage.getItem('kitchenNote') || "Empty"
-};
-
-// --- ALL ITEM LIST DATA & LOGIC ---
-// Weekly Tables
-let tableButtonsWeekly = [
-{label: "Kitchen list", items: [
-{ name: "Chicken", quantity: 12, unit: "Kg", selected: false },
-{ name: "Lamb", quantity: 7, unit: "Kg", selected: false }
-]},
-{label: "Drink list", items: [
-{ name: "Cola", quantity: 24, unit: "Bottle", selected: false },
-{ name: "Juice", quantity: 15, unit: "Bottle", selected: false }
-]},
-{label: "Other items", items: [
-{ name: "Napkins", quantity: 100, unit: "Pack", selected: false },
-{ name: "Plates", quantity: 50, unit: "Piece", selected: false }
-]}
-];
-// Daily Tables
-let tableButtonsDaily = [
-{label: "Kitchen list", items: [
-{ name: "Chicken", quantity: 2, unit: "Kg", selected: false },
-{ name: "Lamb", quantity: 1, unit: "Kg", selected: false }
-]},
-{label: "Drink list", items: [
-{ name: "Cola", quantity: 4, unit: "Bottle", selected: false },
-{ name: "Juice", quantity: 3, unit: "Bottle", selected: false }
-]},
-{label: "Other items", items: [
-{ name: "Napkins", quantity: 20, unit: "Pack", selected: false },
-{ name: "Plates", quantity: 10, unit: "Piece", selected: false }
-]}
-];
-// Toggle state for weekly/daily tables
-let dashboardTableType = localStorage.getItem('dashboardTableType') || "weekly";
-let updateTableType = localStorage.getItem('updateTableType') || "weekly";
-function getCurrentTableButtons() {
-return updateTableType === "weekly" ? tableButtonsWeekly : tableButtonsDaily;
-}
-
-let activeTableIndexWeekly = 0;
-let activeTableIndexDaily = 0;
-function getActiveTableIndex() {
-return updateTableType === "weekly" ? activeTableIndexWeekly : activeTableIndexDaily;
-}
-function setActiveTableIndex(idx) {
-if (updateTableType === "weekly") activeTableIndexWeekly = idx;
-else activeTableIndexDaily = idx;
-}
 
 // --- NAVIGATION ---
 function showDashboard() {
