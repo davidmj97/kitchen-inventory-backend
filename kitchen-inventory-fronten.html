@@ -901,7 +901,56 @@ Delete
 // --- SHARED DATA MODEL (with backend integration) ---
 const backendUrl = 'https://kitchen-inventory-backend.onrender.com'; // <-- CHANGE THIS TO YOUR ACTUAL URL
 
+  let inventoryItems = [];
+let statusInfo = {
+  status: "Inventory Done",
+  doneBy: "John Doe",
+  date: "25 May 2025",
+  note: localStorage.getItem('kitchenNote') || "Empty"
+};
 
+let tableButtonsWeekly = [
+  {label: "Kitchen list", items: [
+    { name: "Chicken", quantity: 12, unit: "Kg", selected: false },
+    { name: "Lamb", quantity: 7, unit: "Kg", selected: false }
+  ]},
+  {label: "Drink list", items: [
+    { name: "Cola", quantity: 24, unit: "Bottle", selected: false },
+    { name: "Juice", quantity: 15, unit: "Bottle", selected: false }
+  ]},
+  {label: "Other items", items: [
+    { name: "Napkins", quantity: 100, unit: "Pack", selected: false },
+    { name: "Plates", quantity: 50, unit: "Piece", selected: false }
+  ]}
+];
+let tableButtonsDaily = [
+  {label: "Kitchen list", items: [
+    { name: "Chicken", quantity: 2, unit: "Kg", selected: false },
+    { name: "Lamb", quantity: 1, unit: "Kg", selected: false }
+  ]},
+  {label: "Drink list", items: [
+    { name: "Cola", quantity: 4, unit: "Bottle", selected: false },
+    { name: "Juice", quantity: 3, unit: "Bottle", selected: false }
+  ]},
+  {label: "Other items", items: [
+    { name: "Napkins", quantity: 20, unit: "Pack", selected: false },
+    { name: "Plates", quantity: 10, unit: "Piece", selected: false }
+  ]}
+];
+let dashboardTableType = localStorage.getItem('dashboardTableType') || "weekly";
+let updateTableType = localStorage.getItem('updateTableType') || "weekly";
+function getCurrentTableButtons() {
+  return updateTableType === "weekly" ? tableButtonsWeekly : tableButtonsDaily;
+}
+let activeTableIndexWeekly = 0;
+let activeTableIndexDaily = 0;
+function getActiveTableIndex() {
+  return updateTableType === "weekly" ? activeTableIndexWeekly : activeTableIndexDaily;
+}
+function setActiveTableIndex(idx) {
+  if (updateTableType === "weekly") activeTableIndexWeekly = idx;
+  else activeTableIndexDaily = idx;
+}
 // --- NAVIGATION ---
 function showDashboard() {
   document.getElementById('dashboardPage').classList.add('active');
@@ -948,11 +997,11 @@ async function deleteInventoryItem(id) {
 
 // --- DASHBOARD RENDERING ---
 async function renderDashboard() {
-  // Fetch inventory from backend
   const boxCon = document.getElementById('inventoryBoxContainer');
   boxCon.innerHTML = "";
   const data = await fetchInventory();
-  const inventoryItems = data ? Object.values(data) : [];
+  inventoryItems.length = 0;
+  inventoryItems.push(...(data ? Object.values(data) : []));
   inventoryItems.forEach(item => {
     boxCon.innerHTML += `
       <div class="inventory-box">
@@ -1039,20 +1088,19 @@ svg.querySelector('rect').setAttribute('stroke', '#81e4a2');
 renderDashboard();
 }
 document.addEventListener('DOMContentLoaded', function() {
-// Set dashboard toggle knob position
-const knob = document.getElementById('toggleKnob');
-if (dashboardTableType === "weekly") {
-knob.setAttribute('cx', 10);
-knob.setAttribute('fill', '#fff');
-} else {
-knob.setAttribute('cx', 24);
-knob.setAttribute('fill', '#81e4a2');
-}
-renderDashboard();
-
-setTableToggleVisual(updateTableType);
-renderTableButtons();
-renderTable();
+  // Set dashboard toggle knob position
+  const knob = document.getElementById('toggleKnob');
+  if (dashboardTableType === "weekly") {
+    knob.setAttribute('cx', 10);
+    knob.setAttribute('fill', '#fff');
+  } else {
+    knob.setAttribute('cx', 24);
+    knob.setAttribute('fill', '#81e4a2');
+  }
+  renderDashboard();
+  setTableToggleVisual(updateTableType); // 3. FIX: use updateTableType, not tableType
+  renderTableButtons();
+  renderTable();
 });
 
 // --- PAGE 2 TOGGLE BUTTON LOGIC (DAILY/WEEKLY TABLES) ---
