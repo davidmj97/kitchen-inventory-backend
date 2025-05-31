@@ -899,7 +899,15 @@ Delete
 <script>
 // --- SHARED DATA MODEL ---
 // --- SHARED DATA MODEL (with backend integration) ---
-const backendUrl = 'https://kitchen-inventory-backend.onrender.com'; // <-- CHANGE THIS TO YOUR ACTUAL URL
+const backendUrl = "https://kitchen-inventory-backend.onrender.com";
+
+  const cors = require('cors');
+app.use(cors({
+  origin: [
+    "https://davidmj97.github.io",
+    "http://localhost:5500"
+  ]
+}));
 
 let inventoryItems = [];
 let statusInfo = {
